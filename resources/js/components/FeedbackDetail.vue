@@ -2,6 +2,7 @@
 import { router, useForm } from '@inertiajs/vue3';
 import { ArrowTopRightOnSquareIcon, ArrowUturnLeftIcon, CheckIcon, TrashIcon } from '@heroicons/vue/20/solid';
 import { computed } from 'vue';
+import Disclosure from './Disclosure.vue';
 import { browserName, timeAgo } from '../utils.js';
 
 const props = defineProps({ item: Object, query: String });
@@ -116,27 +117,26 @@ function discard() {
 
             <!-- The raw details, for when the summary isn't enough -->
             <div class="mt-5 space-y-2">
-                <details v-if="errors" class="rounded-lg ring-1 ring-neutral-950/10">
-                    <summary class="cursor-pointer px-3 py-2 text-xs/5 font-medium text-neutral-700 select-none">Console errors</summary>
-                    <ul class="space-y-2 border-t border-neutral-950/5 px-3 py-2 font-mono text-xs/5">
-                        <li v-for="(entry, i) in item.console" :key="i" class="break-all">
+                <Disclosure v-if="errors" label="Console errors" :count="errors" tone="red" open>
+                    <ul class="divide-y divide-neutral-950/5 font-mono text-xs/5">
+                        <li v-for="(entry, i) in item.console" :key="i" class="px-3 py-2 break-all">
                             <span class="text-red-700">{{ entry.message }}</span>
                             <span v-if="entry.source" class="block text-neutral-500">{{ entry.source }}</span>
                         </li>
                     </ul>
-                </details>
-                <details v-if="failed" class="rounded-lg ring-1 ring-neutral-950/10">
-                    <summary class="cursor-pointer px-3 py-2 text-xs/5 font-medium text-neutral-700 select-none">Failed requests</summary>
-                    <ul class="space-y-1 border-t border-neutral-950/5 px-3 py-2 font-mono text-xs/5">
-                        <li v-for="(entry, i) in item.network" :key="i" class="break-all">
-                            <span class="font-medium text-red-700">{{ entry.status || entry.error || 'failed' }}</span> {{ entry.method }} {{ entry.url }}
+                </Disclosure>
+                <Disclosure v-if="failed" label="Failed requests" :count="failed" tone="red" open>
+                    <ul class="divide-y divide-neutral-950/5 font-mono text-xs/5">
+                        <li v-for="(entry, i) in item.network" :key="i" class="flex gap-x-2 px-3 py-2">
+                            <span class="shrink-0 font-medium text-red-700">{{ entry.status || entry.error || 'failed' }}</span>
+                            <span class="shrink-0 text-neutral-500">{{ entry.method }}</span>
+                            <span class="min-w-0 break-all text-neutral-800">{{ entry.url }}</span>
                         </li>
                     </ul>
-                </details>
-                <details v-if="item.element?.html" class="rounded-lg ring-1 ring-neutral-950/10">
-                    <summary class="cursor-pointer px-3 py-2 text-xs/5 font-medium text-neutral-700 select-none">Element HTML</summary>
-                    <pre class="overflow-x-auto border-t border-neutral-950/5 px-3 py-2 font-mono text-xs/5 text-neutral-800">{{ item.element.html }}</pre>
-                </details>
+                </Disclosure>
+                <Disclosure v-if="item.element?.html" label="Element HTML">
+                    <pre class="overflow-x-auto px-3 py-2 font-mono text-xs/5 text-neutral-800">{{ item.element.html }}</pre>
+                </Disclosure>
             </div>
         </div>
 

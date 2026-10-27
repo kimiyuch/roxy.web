@@ -124,7 +124,7 @@ function short(date) {
                     </Link>
                     <FeedbackDetail :key="item.id" :item="item" :query="query" class="min-h-0 flex-1" />
                 </template>
-                <div v-else class="grid flex-1 place-items-center">
+                <div v-else class="grid flex-1 place-items-center bg-gray-50">
                     <div class="text-center">
                         <img src="/images/roxy.webp" alt="" class="mx-auto size-16 opacity-60 grayscale-50" />
                         <p class="mt-3 text-sm text-neutral-500">Pick an entry to see it here.</p>

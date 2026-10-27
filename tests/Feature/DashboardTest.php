@@ -40,6 +40,12 @@ class DashboardTest extends TestCase
         $this->actingAs($user)->get("/app/feedback/{$other->id}")->assertForbidden();
     }
 
+    public function test_signing_out_lands_on_the_login_page(): void
+    {
+        $this->actingAs(User::factory()->create())->post('/logout')->assertRedirect('/login');
+        $this->assertGuest();
+    }
+
     public function test_feedback_is_resolved_with_a_note_and_reopened(): void
     {
         $feedback = Feedback::factory()->create();
