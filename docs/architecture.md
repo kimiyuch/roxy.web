@@ -23,6 +23,10 @@ Decided on 2026-10-27, after `plan.md`. Where the two disagree, this file wins.
 
 Plus `/` (landing page) and `/r/{reviewer}` (magic links).
 
+## Dashboard accounts
+
+Fortify, session login. `/register` is open: it creates a new account with the person signing up as its owner (`CreateNewUser`, at most 5 sign-ups per hour and IP). Password reset by email. No email verification yet. `roxy:user` still creates users from the command line.
+
 ## Reviewer login (magic link)
 
 Roxy's domain can't write to the client site's localStorage, so the login goes through the site:
@@ -76,6 +80,25 @@ Not yet: scoping a token to a single site (`site_id` on the token).
 - Inertia SSR is off (`config/inertia.php`). There's no Node on the server; `public/build` is built locally and committed, as in the other kimiyu repos.
 - Imagick: re-check that it's enabled for the PHP version chosen in the Hostpoint panel.
 
+## Widget
+
+`resources/widget/`, plain JavaScript, built by `vite.widget.config.js` (`npm run build:widget`, part of `npm run build`) into two classic scripts in `public/`:
+
+- `widget.js` (≈ 10 KB gzipped): boots from `data-site`, finds Roxy's origin from its own `src`, renders into a `<roxy-widget>` shadow root (plain CSS in `styles.css`, no Tailwind: its `@property` variables don't work in shadow DOM).
+- `widget-screenshot.js` (≈ 10 KB gzipped, `modern-screenshot`): only loaded when a reviewer opens the panel. Takes the viewport (`translate(-scroll)` on the root, the visible area without scrollbars, the same box as `element.rect`), at most 2× and 2560 px, without Roxy itself; taken again after the reviewer points at an element, so `element.rect` matches it.
+
+Behaviour:
+
+- Visitors without a token get nothing: no button, no capture, no requests beyond loading the script.
+- `#roxy=CODE` (from the magic link) is removed from the address, traded for a token (localStorage `roxy:<site key>`), and the panel opens.
+- With a token, console errors (`console.error`, `error`, `unhandledrejection`) and failed requests (`fetch`, XHR, failed scripts / images; query strings dropped; Roxy's own calls ignored) are recorded from load, 20 each. Capture pauses while the screenshot runs.
+- `?feedback` in the address without a token shows the sign-in form (email → `POST /link`).
+- The panel: what's open on this page (all reviewers), text, the screenshot plus own images (pick, drop, paste; ≤ 5, fitted to 2560 px), "Point at it" (outline in the shadow root, Esc cancels), Send (⌘/Ctrl + Enter). The automatic screenshot is always uploaded first.
+- Requests without an `Origin` header (same-origin, non-browser) pass `WidgetCors` without CORS headers; the token is what protects the API.
+- Selectors skip utility classes (Tailwind and the like) and state classes, and walk up to an id, a landmark (`main`, `header`, `nav`, `section`, …) or four steps; a click on an icon counts as its button or link.
+- Texts in `strings.js`: German (Swiss spelling, "Sie") when `<html lang>` or the browser says `de`, English otherwise.
+- Try it locally on `https://roxy.web.test/widget-test` (local only): a stand-in client page with a console error and a failed request. It needs a site named "Widget test" with that start URL; invite yourself with `roxy:invite` and open the link.
+
 ## Look and feel
 
 The landing page (`resources/views/home.blade.php`) draws the widget and the dashboard as mocks; those are the design reference for building them.
@@ -87,6 +110,4 @@ The landing page (`resources/views/home.blade.php`) draws the widget and the das
 
 ## Next
 
-1. `widget.js`: Shadow DOM, text + auto screenshot (lazy `modern-screenshot`), magic-link code pickup, open feedback on the page. Built separately by Vite into `public/widget.js` and served at a stable URL.
-2. Dashboard: sites (create, origins, script tag), reviewers (invite, remove), agent tokens, as more entries in the sidebar. The feedback inbox already has the three-column layout. Until then: `roxy:user`, `roxy:site`, `roxy:invite`, `roxy:mcp-token`.
-3. `deploy.sh` and the Hostpoint setup (cron, `.env`, keep `storage/` out of the rsync).
+See `docs/progress.md`.

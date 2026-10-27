@@ -18,13 +18,19 @@ function submit() {
         <p v-if="page.props.flash?.status" class="mb-6 rounded-md bg-emerald-50 px-3 py-2 text-sm/6 text-emerald-800 ring-1 ring-emerald-600/15">{{ page.props.flash.status }}</p>
         <form class="space-y-5" @submit.prevent="submit">
             <TextInput id="email" v-model="form.email" label="Email" type="email" autocomplete="username" required autofocus :error="form.errors.email" />
-            <TextInput id="password" v-model="form.password" label="Password" type="password" autocomplete="current-password" required :error="form.errors.password">
-                <template #hint>
-                    <Link href="/forgot-password" class="text-sm/6 font-medium text-roxy-700 hover:text-roxy-600">Forgot it?</Link>
-                </template>
-            </TextInput>
+            <TextInput id="password" v-model="form.password" label="Password" type="password" autocomplete="current-password" required :error="form.errors.password" />
             <PrimaryButton class="w-full" :disabled="form.processing">Sign in</PrimaryButton>
         </form>
+
+        <div class="mt-6 space-y-1 text-center text-sm/6">
+            <p>
+                <Link href="/forgot-password" class="font-medium text-roxy-700 hover:text-roxy-600">Forgot your password?</Link>
+            </p>
+            <p class="text-neutral-600">
+                No account yet?
+                <Link href="/register" class="font-medium text-roxy-700 hover:text-roxy-600">Sign up</Link>
+            </p>
+        </div>
 
         <template #after>
             <p class="mt-6 text-center text-sm/6 text-pretty text-neutral-500">

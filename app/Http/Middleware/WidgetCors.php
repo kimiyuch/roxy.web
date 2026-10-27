@@ -28,6 +28,12 @@ class WidgetCors
         $request->route()->setParameter('site', $site);
         $origin = $request->headers->get('Origin');
 
+        // Browsers send Origin on every cross-origin request, so a missing one means a
+        // same-origin page (Roxy's own test page) or a non-browser client: no CORS needed.
+        if ($origin === null) {
+            return $request->isMethod('OPTIONS') ? response()->noContent() : $next($request);
+        }
+
         if (! $site->allowsOrigin($origin)) {
             return response()->json(['message' => 'Origin not allowed.'], Response::HTTP_FORBIDDEN);
         }

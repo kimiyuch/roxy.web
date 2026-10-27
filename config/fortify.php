@@ -161,8 +161,9 @@ return [
     |
     */
 
-    // No sign-up yet: users are created with `php artisan roxy:user`.
+    // Sign-up creates a new account with its owner (CreateNewUser).
     'features' => [
+        Features::registration(),
         Features::resetPasswords(),
         Features::updatePasswords(),
     ],

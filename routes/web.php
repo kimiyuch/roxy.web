@@ -10,6 +10,9 @@ Route::view('/legal', 'legal')->name('legal');
 // Source page for the Open Graph image; only reachable during local development.
 if (app()->isLocal()) {
     Route::view('/og-image', 'og-image');
+
+    // A stand-in client site for trying the widget
+    Route::view('/widget-test', 'widget-test');
 }
 
 // The magic link from a reviewer's email; hands the widget a one-time code.

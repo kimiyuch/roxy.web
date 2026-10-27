@@ -1,0 +1,542 @@
+/* Roxy's widget, inside its own shadow root. Plain CSS: the page's styles can't reach in,
+   and Tailwind's @property-based utilities don't work in shadow DOM. Colours follow the
+   landing page mock (resources/views/components/site-window.blade.php). */
+
+:host {
+    all: initial;
+    --accent: #d34f72;
+    --ink: #0a0a0a;
+    --text: #404040;
+    --muted: #737373;
+    --faint: #a3a3a3;
+    --line: rgb(10 10 10 / 0.08);
+    --sky-50: #f2f7fc;
+    --sky-100: #dcebf8;
+    --sky-500: #6b97c9;
+    --sky-800: #374f70;
+    --pin: #ff7a59;
+    --red: #b91c1c;
+    --green: #047857;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.root {
+    position: fixed;
+    z-index: 2147483000;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    font: 14px/20px ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+}
+
+.root.left {
+    right: auto;
+    left: 24px;
+    align-items: flex-start;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+}
+
+button:disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* The round button */
+.launcher {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 0 4px #fff, 0 10px 25px -5px rgb(0 0 0 / 0.25);
+    transition: transform 0.15s ease;
+}
+
+.launcher:hover {
+    transform: scale(1.05);
+}
+
+.launcher:focus-visible,
+.button:focus-visible,
+.ghost:focus-visible {
+    outline: 2px solid var(--sky-500);
+    outline-offset: 2px;
+}
+
+.launcher .icon {
+    width: 24px;
+    height: 24px;
+}
+
+.badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 20px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+}
+
+/* The panel */
+.panel {
+    width: min(352px, calc(100vw - 24px));
+    max-height: calc(100vh - 110px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgb(10 10 10 / 0.1), 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    animation: rise 0.18s ease-out;
+}
+
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .panel,
+    .launcher {
+        animation: none;
+        transition: none;
+    }
+}
+
+.head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+.head img {
+    width: 28px;
+    height: 28px;
+}
+
+.head-text {
+    min-width: 0;
+    flex: 1;
+}
+
+.title {
+    font-weight: 600;
+}
+
+.subtitle {
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.icon-button {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    color: var(--faint);
+}
+
+.icon-button:hover {
+    background: var(--sky-50);
+    color: var(--ink);
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+/* What's already open on this page */
+.open-here {
+    border-radius: 6px;
+    background: var(--sky-50);
+    color: var(--sky-800);
+    font-size: 12px;
+}
+
+.open-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 10px;
+    text-align: left;
+}
+
+.open-toggle .icon {
+    color: var(--sky-500);
+}
+
+.open-toggle span {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.open-toggle .chevron {
+    transition: transform 0.15s;
+}
+
+.open-here.expanded .chevron {
+    transform: rotate(180deg);
+}
+
+.open-list {
+    display: none;
+    max-height: 160px;
+    overflow-y: auto;
+    padding: 0 10px 8px 34px;
+    list-style: none;
+}
+
+.open-here.expanded .open-list {
+    display: block;
+}
+
+.open-list li + li {
+    margin-top: 6px;
+}
+
+.open-list .who {
+    color: var(--muted);
+}
+
+/* The text field */
+textarea {
+    display: block;
+    width: 100%;
+    min-height: 88px;
+    max-height: 240px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1px rgb(10 10 10 / 0.15);
+    resize: vertical;
+    line-height: 20px;
+}
+
+textarea:focus {
+    outline: 3px solid var(--sky-100);
+    box-shadow: inset 0 0 0 1px var(--sky-500);
+}
+
+textarea::placeholder {
+    color: var(--faint);
+}
+
+/* Screenshots and the picked element */
+.shots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.shot {
+    position: relative;
+    width: 80px;
+    height: 56px;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--sky-50);
+    box-shadow: 0 0 0 1px rgb(10 10 10 / 0.1);
+}
+
+.shot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+}
+
+.shot.taking::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.7), transparent);
+    animation: shimmer 1.1s infinite;
+}
+
+@keyframes shimmer {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.shot .remove {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: rgb(10 10 10 / 0.6);
+    color: #fff;
+    opacity: 0;
+}
+
+.shot:hover .remove,
+.shot .remove:focus-visible {
+    opacity: 1;
+}
+
+.shot .remove .icon {
+    width: 12px;
+    height: 12px;
+}
+
+.facts {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text);
+}
+
+.fact {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.fact .icon {
+    color: var(--faint);
+}
+
+.fact.element .icon {
+    color: var(--pin);
+}
+
+.fact code {
+    overflow: hidden;
+    font: 12px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.fact .clear {
+    margin-left: auto;
+    color: var(--faint);
+}
+
+.fact .clear:hover {
+    color: var(--ink);
+}
+
+.fact.muted {
+    color: var(--muted);
+}
+
+.error {
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: #fef2f2;
+    color: var(--red);
+    font-size: 12px;
+}
+
+/* Footer */
+.foot {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--line);
+}
+
+.ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.ghost .icon {
+    color: var(--faint);
+}
+
+.ghost:hover {
+    background: var(--sky-50);
+    color: var(--ink);
+}
+
+.ghost:first-child {
+    margin-left: -8px;
+}
+
+.button {
+    margin-left: auto;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
+}
+
+.button:hover:not(:disabled) {
+    filter: brightness(0.94);
+}
+
+.button.wide {
+    width: 100%;
+    margin: 0;
+}
+
+/* Sent, and the sign-in form */
+.done {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 28px 24px;
+    text-align: center;
+}
+
+.done .icon {
+    width: 32px;
+    height: 32px;
+    color: var(--green);
+}
+
+.done p {
+    color: var(--muted);
+}
+
+.field {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1px rgb(10 10 10 / 0.15);
+}
+
+.field:focus {
+    outline: 3px solid var(--sky-100);
+    box-shadow: inset 0 0 0 1px var(--sky-500);
+}
+
+.lead {
+    color: var(--text);
+}
+
+/* Picking an element */
+.layer {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483001;
+    pointer-events: none;
+}
+
+.pick-box {
+    display: none;
+    position: fixed;
+    border: 2px dashed var(--pin);
+    border-radius: 4px;
+    background: rgb(255 122 89 / 0.08);
+    transition: all 0.06s ease-out;
+}
+
+.pick-hint {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: #fff;
+    font: 500 13px/18px ui-sans-serif, system-ui, -apple-system, sans-serif;
+    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.3);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* Phones: closer to the edges, and the panel uses the width */
+@media (max-width: 480px) {
+    .root,
+    .root.left {
+        right: 12px;
+        left: 12px;
+        bottom: 12px;
+    }
+
+    .panel {
+        width: 100%;
+        max-height: calc(100dvh - 88px);
+    }
+
+    textarea,
+    .field {
+        font-size: 16px; /* below 16px iOS zooms into the field */
+    }
+}

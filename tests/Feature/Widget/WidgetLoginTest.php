@@ -154,6 +154,15 @@ class WidgetLoginTest extends TestCase
             ->assertHeaderMissing('Access-Control-Allow-Origin');
     }
 
+    public function test_requests_without_an_origin_get_no_cors_headers(): void
+    {
+        $site = Site::factory()->create();
+
+        $this->postJson("/api/widget/{$site->key}/session", ['code' => 'nope'])
+            ->assertUnprocessable()
+            ->assertHeaderMissing('Access-Control-Allow-Origin');
+    }
+
     public function test_preflight_is_answered_for_allowed_origins(): void
     {
         $site = Site::factory()->create(['allowed_origins' => ['https://*.example.ch']]);
