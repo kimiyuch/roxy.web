@@ -1,0 +1,31 @@
+@import 'tailwindcss' source(none);
+
+@source '../views';
+@source '../js';
+
+@theme {
+    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    --font-sans--font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+
+    /* The sky behind Roxy on the app icon (#dcebf8 → #6b97c9). The brand colour (`roxy` until it gets a kimiyu name). */
+    --color-roxy-50: #f2f7fc;
+    --color-roxy-100: #dcebf8;
+    --color-roxy-200: #c2daf1;
+    --color-roxy-300: #9fc0e3;
+    --color-roxy-400: #7fa8d6;
+    --color-roxy-500: #6b97c9;
+    --color-roxy-600: #4f79ad;
+    --color-roxy-700: #40618c;
+    --color-roxy-800: #374f70;
+    --color-roxy-900: #2f425c;
+    --color-roxy-950: #1e2a3b;
+
+    /* Roxy's face: the galah's rose. */
+    --color-galah-100: #fbe3e9;
+    --color-galah-400: #f08aa0;
+    --color-galah-600: #d34f72;
+
+    /* The feedback pin. */
+    --color-pin-500: #ff7a59;
+    --color-pin-600: #e5482a;
+}

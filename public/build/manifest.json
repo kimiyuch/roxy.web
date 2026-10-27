@@ -1,0 +1,25 @@
+{
+  "_fonts-C-yG65xm.css": {
+    "file": "assets/fonts-C-yG65xm.css",
+    "src": "_fonts-C-yG65xm.css"
+  },
+  "_inter-400-600-normal-B7rthDxM.woff2": {
+    "file": "assets/inter-400-600-normal-B7rthDxM.woff2",
+    "src": "_inter-400-600-normal-B7rthDxM.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-DDu1xqQD.css",
+    "name": "app",
+    "names": [
+      "app.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-i4pHg1_8.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}

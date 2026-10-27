@@ -1,0 +1,15 @@
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/build/assets/inter-400-600-normal-B7rthDxM.woff2") format("woff2");
+}
+
+:root {
+  --font-inter: "Inter";
+}
+
+.font-inter {
+  font-family: var(--font-inter);
+}

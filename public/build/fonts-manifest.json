@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "style": {
+    "file": "assets/fonts-C-yG65xm.css",
+    "familyStyles": {
+      "inter": "@font-face {\n  font-family: \"Inter\";\n  font-style: normal;\n  font-weight: 400 600;\n  font-display: swap;\n  src: url(\"/build/assets/inter-400-600-normal-B7rthDxM.woff2\") format(\"woff2\");\n}\n\n.font-inter {\n  font-family: var(--font-inter);\n}"
+    },
+    "variables": {
+      "inter": "--font-inter: \"Inter\";"
+    }
+  },
+  "preloads": [
+    {
+      "alias": "inter",
+      "family": "Inter",
+      "weight": "400 600",
+      "style": "normal",
+      "file": "assets/inter-400-600-normal-B7rthDxM.woff2",
+      "as": "font",
+      "type": "font/woff2",
+      "crossorigin": "anonymous"
+    }
+  ],
+  "families": {
+    "inter": {
+      "family": "Inter",
+      "variable": "--font-inter",
+      "variants": {
+        "400 600:normal": {
+          "files": [
+            {
+              "file": "assets/inter-400-600-normal-B7rthDxM.woff2",
+              "format": "woff2"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
