@@ -14,39 +14,18 @@ use Inertia\Response;
 
 class FeedbackController extends Controller
 {
+    /** The inbox: the list on the left, nothing selected yet. */
     public function index(Request $request): Response
     {
-        $filters = $request->validate([
-            'site' => ['nullable', 'string'],
-            'status' => ['nullable', 'in:open,done,all'],
-        ]);
-        $status = $filters['status'] ?? 'open';
-        $account = $request->user()->account;
-
-        $feedback = Feedback::query()
-            ->forAccount($account->id)
-            ->when($filters['site'] ?? null, fn ($query, $site) => $query->where('site_id', $site))
-            ->when($status !== 'all', fn ($query) => $query->where('status', $status))
-            ->with(['site', 'reviewer'])
-            ->withCount('screenshots')
-            ->latest()
-            ->paginate(50)
-            ->withQueryString();
-
-        return Inertia::render('feedback/Index', [
-            'feedback' => FeedbackResource::collection($feedback),
-            'sites' => $account->sites()->orderBy('name')->get(['id', 'name']),
-            'filters' => ['site' => $filters['site'] ?? null, 'status' => $status],
-        ]);
+        return $this->inbox($request);
     }
 
-    public function show(Feedback $feedback): Response
+    /** The inbox with one entry open next to the list. */
+    public function show(Request $request, Feedback $feedback): Response
     {
         Gate::authorize('view', $feedback);
 
-        return Inertia::render('feedback/Show', [
-            'feedback' => new FeedbackResource($feedback->load(['site', 'reviewer', 'resolvedBy', 'screenshots'])),
-        ]);
+        return $this->inbox($request, $feedback);
     }
 
     public function resolve(Request $request, Feedback $feedback, ResolveFeedback $resolve): RedirectResponse
@@ -63,12 +42,41 @@ class FeedbackController extends Controller
         return back();
     }
 
-    public function destroy(Feedback $feedback, DeleteFeedback $delete): RedirectResponse
+    public function destroy(Request $request, Feedback $feedback, DeleteFeedback $delete): RedirectResponse
     {
         Gate::authorize('delete', $feedback);
 
         $delete->execute($feedback);
 
-        return to_route('feedback.index');
+        return to_route('feedback.index', $request->only('site', 'status'));
+    }
+
+    private function inbox(Request $request, ?Feedback $selected = null): Response
+    {
+        $filters = $request->validate([
+            'site' => ['nullable', 'string'],
+            'status' => ['nullable', 'in:open,done'],
+        ]);
+        $status = $filters['status'] ?? 'open';
+        $account = $request->user()->account;
+
+        $base = Feedback::query()
+            ->forAccount($account->id)
+            ->when($filters['site'] ?? null, fn ($query, $site) => $query->where('site_id', $site));
+
+        $feedback = (clone $base)
+            ->where('status', $status)
+            ->with(['site', 'reviewer'])
+            ->withCount('screenshots')
+            ->latest()
+            ->paginate(50)
+            ->withQueryString();
+
+        return Inertia::render('feedback/Index', [
+            'feedback' => FeedbackResource::collection($feedback),
+            'counts' => (clone $base)->toBase()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
+            'selected' => $selected ? new FeedbackResource($selected->load(['site', 'reviewer', 'resolvedBy', 'screenshots'])) : null,
+            'filters' => ['site' => $filters['site'] ?? null, 'status' => $status],
+        ]);
     }
 }

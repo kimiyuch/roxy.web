@@ -10,7 +10,7 @@ Decided on 2026-10-27, after `plan.md`. Where the two disagree, this file wins.
 | Dashboard | Inertia + Vue 3 (no separate SPA API). |
 | Reviewers | Per site. One invite = one site. |
 | Can reviewers see each other's feedback? | Yes: the widget lists open feedback on the current page from every reviewer of the site, to avoid duplicates. |
-| Screenshot storage | Exoscale SOS (`ch-dk-2`, Switzerland), disk `exoscale`. `local` in development. |
+| Screenshot storage | The `local` disk (`storage/app/private`) on the Hostpoint server, in Switzerland. No S3: screenshots are served through Laravel as short-lived signed URLs (`temporaryUrl`, `serve => true`). `deploy.sh` must never touch `storage/`. |
 | Tenancy | `accounts` from day one; every query is scoped by `account_id` through policies. No teams, roles or billing yet. |
 
 ## One app, three ways in
@@ -76,8 +76,17 @@ Not yet: scoping a token to a single site (`site_id` on the token).
 - Inertia SSR is off (`config/inertia.php`). There's no Node on the server; `public/build` is built locally and committed, as in the other kimiyu repos.
 - Imagick: re-check that it's enabled for the PHP version chosen in the Hostpoint panel.
 
+## Look and feel
+
+The landing page (`resources/views/home.blade.php`) draws the widget and the dashboard as mocks; those are the design reference for building them.
+
+- **Widget** (`components/site-window.blade.php`): a round button in the galah rose (`galah-600`), bottom right; above it a white panel. From top to bottom: header (Roxy icon, “Feedback on this page”, who's signed in), a hint with what's already open on the page, the text field, then the attachments: screenshot thumbnail, the picked element (`pin` colour, monospace selector) and “page, browser and errors added”. Footer: “Add image” and Send. The picked element on the page gets a dashed `pin-500` outline and the pin from the icon above it.
+- **Dashboard** (`components/dashboard-window.blade.php`): three columns. Sidebar on `roxy-50`: Roxy, nav (Feedback with open count, Sites, Reviewers, Agent tokens), then the sites with a colour dot and open count. The list: Open/Done switch, rows with reviewer · site + path · time, two lines of text, chips for screenshots, element and errors; the selected row has a `roxy-500` bar. The detail on the right: status pill, text, screenshot with the element outlined, a small Page/Element/Browser/Console list, and at the bottom the note field next to Done (`roxy-600`).
+- In the app: `layouts/AppLayout.vue` (sidebar; the sites with open counts are a shared Inertia prop), `pages/feedback/Index.vue` (list + detail on one page: `/app/feedback` and `/app/feedback/{id}` render the same page, the filters stay in the query string), `components/FeedbackDetail.vue`. The element outline on the screenshot needs the widget to send `element.rect` in viewport coordinates, relative to the automatic screenshot.
+- Colours: `roxy` (sky) for the dashboard and the site, `galah` for the widget and accents, `pin` only for picked elements. Type: Inter, headings in Figtree (`font-display`).
+
 ## Next
 
 1. `widget.js`: Shadow DOM, text + auto screenshot (lazy `modern-screenshot`), magic-link code pickup, open feedback on the page. Built separately by Vite into `public/widget.js` and served at a stable URL.
-2. Dashboard: sites (create, origins, script tag), reviewers (invite, remove), MCP tokens. Until then: `roxy:user`, `roxy:site`, `roxy:invite`, `roxy:mcp-token`.
-3. `deploy.sh` and the Hostpoint setup (cron, `.env`, Exoscale bucket).
+2. Dashboard: sites (create, origins, script tag), reviewers (invite, remove), agent tokens, as more entries in the sidebar. The feedback inbox already has the three-column layout. Until then: `roxy:user`, `roxy:site`, `roxy:invite`, `roxy:mcp-token`.
+3. `deploy.sh` and the Hostpoint setup (cron, `.env`, keep `storage/` out of the rsync).

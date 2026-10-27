@@ -2,7 +2,11 @@
 
 return [
 
-    // Where screenshots live: `local` in development, `exoscale` (S3, Switzerland) in production.
+    // GitHub repository of Roxy (website, dashboard and widget).
+    'repository_url' => env('ROXY_REPOSITORY_URL', 'https://github.com/kimiyuch/roxy.web'),
+
+    // Where screenshots live. `local` is storage/app/private, in production too (Hostpoint, Switzerland);
+    // they're only ever handed out as short-lived signed URLs.
     'disk' => env('ROXY_DISK', 'local'),
 
     // Screenshots are fitted inside this edge on upload; MCP gets them at the smaller one,

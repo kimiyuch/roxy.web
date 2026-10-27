@@ -4,7 +4,13 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\MagicLinkController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => view('home'))->name('home');
+Route::view('/', 'home')->name('home');
+Route::view('/legal', 'legal')->name('legal');
+
+// Source page for the Open Graph image; only reachable during local development.
+if (app()->isLocal()) {
+    Route::view('/og-image', 'og-image');
+}
 
 // The magic link from a reviewer's email; hands the widget a one-time code.
 Route::get('r/{reviewer}', MagicLinkController::class)->middleware(['signed', 'throttle:30,1'])->name('reviewers.magic-link');

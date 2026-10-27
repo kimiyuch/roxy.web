@@ -28,9 +28,15 @@ class DashboardTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->component('feedback/Index')
                 ->has('feedback.data', 1)
-                ->where('feedback.data.0.id', $mine->id));
+                ->where('feedback.data.0.id', $mine->id)
+                ->where('counts.open', 1)
+                ->where('selected', null)
+                ->has('sites', 1));
 
-        $this->actingAs($user)->get("/app/feedback/{$mine->id}")->assertOk();
+        $this->actingAs($user)->get("/app/feedback/{$mine->id}")
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('feedback/Index')
+                ->where('selected.data.id', $mine->id));
         $this->actingAs($user)->get("/app/feedback/{$other->id}")->assertForbidden();
     }
 

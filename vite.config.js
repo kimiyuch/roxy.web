@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
-import { local } from 'laravel-vite-plugin/fonts';
+import { bunny, local } from 'laravel-vite-plugin/fonts';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 
@@ -14,6 +14,10 @@ export default defineConfig({
                 local('Inter', {
                     variants: [{ src: 'resources/fonts/InterVariable.woff2', weight: '400 600' }],
                     variable: '--font-inter',
+                }),
+                bunny('Figtree', {
+                    weights: [500, 600],
+                    variable: '--font-figtree',
                 }),
             ],
         }),

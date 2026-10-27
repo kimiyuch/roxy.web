@@ -60,18 +60,6 @@ return [
             'report' => false,
         ],
 
-        'exoscale' => [
-            'driver' => 's3',
-            'key' => env('EXOSCALE_ACCESS_KEY_ID'),
-            'secret' => env('EXOSCALE_SECRET_ACCESS_KEY'),
-            'region' => env('EXOSCALE_REGION', 'ch-dk-2'),
-            'bucket' => env('EXOSCALE_BUCKET'),
-            'endpoint' => env('EXOSCALE_ENDPOINT', 'https://sos-ch-dk-2.exo.io'),
-            'use_path_style_endpoint' => true,
-            'throw' => true,
-            'report' => false,
-        ],
-
     ],
 
     /*

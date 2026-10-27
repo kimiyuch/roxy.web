@@ -6,6 +6,7 @@
 @theme {
     --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
     --font-sans--font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    --font-display: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
 
     /* The sky behind Roxy on the app icon (#dcebf8 → #6b97c9). The brand colour (`roxy` until it gets a kimiyu name). */
     --color-roxy-50: #f2f7fc;

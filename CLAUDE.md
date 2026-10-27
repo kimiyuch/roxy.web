@@ -4,17 +4,19 @@ A drop-in feedback widget for websites: clients point at a problem, and a coding
 
 Read first:
 
+- `docs/progress.md`: what's done, what's next. Update it at the end of a session.
 - `docs/architecture.md`: the backend as decided (surfaces, magic-link flow, data model, MCP, Hostpoint). Wins over the plan.
 - `docs/plan.md`: the original product plan (scope, phases). Written before the name, so it says "Feedback Widget".
 - `docs/naming-and-icon.md`: the name, the icon, the palette, the kimiyu house style.
 
 ## Stack
 
-Laravel 13, Fortify (dashboard login), Sanctum (MCP tokens), laravel/mcp, Inertia + Vue 3 + Tailwind 4, spatie/image + Imagick. SQLite locally, MySQL on Hostpoint. Runs in Herd at `http://roxy.web.test`.
+Laravel 13, Fortify (dashboard login), Sanctum (MCP tokens), laravel/mcp, Inertia + Vue 3 + Tailwind 4, spatie/image + Imagick. SQLite locally, MySQL on Hostpoint. Runs in Herd at `https://roxy.web.test`.
 
 - Business logic lives in `app/Actions` (feedback create / resolve / delete, reviewer invite / login code / exchange), shared by the controllers and the MCP tools.
 - Widget API: `routes/api.php`, `app/Http/Controllers/Widget`, middleware `WidgetCors` + `AuthenticateReviewer`.
-- Dashboard pages: `resources/js/pages` (`auth/*`, `feedback/*`).
+- Website: `home.blade.php`, `legal.blade.php`, Blade components in `resources/views/components` (layout, header, footer like croc.web and wuff.web). `og-image.blade.php` → `scripts/og-image.sh` → `public/images/og.png`.
+- Dashboard pages: `resources/js/pages` (`auth/*`, `feedback/Index.vue`: the inbox, list and detail in one), layout with the sidebar in `resources/js/layouts/AppLayout.vue`. Icons: `@heroicons/vue` here, `blade-heroicons` on the website. The landing page's mocks (`site-window`, `dashboard-window`) are the design reference for the widget and the dashboard, see `docs/architecture.md`, Look and feel.
 - Settings: `config/roxy.php`.
 
 ## Conventions

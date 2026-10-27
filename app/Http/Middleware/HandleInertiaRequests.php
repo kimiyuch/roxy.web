@@ -40,6 +40,12 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user()?->only('id', 'name', 'email'),
             ],
+            // The sidebar: the account's sites with what's open on each.
+            'sites' => fn () => $request->user()?->account->sites()
+                ->withCount(['feedback as open_count' => fn ($query) => $query->where('status', 'open')])
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->map->only('id', 'name', 'open_count'),
             'flash' => [
                 'status' => fn () => $request->session()->get('status'),
             ],

@@ -6,7 +6,7 @@ A Laravel 13 app with an Inertia + Vue dashboard. See `docs/architecture.md` for
 
 ## Local development
 
-The app runs in [Herd](https://herd.laravel.com) at `http://roxy.web.test`.
+The app runs in [Herd](https://herd.laravel.com) at `https://roxy.web.test`.
 
 ```sh
 composer install
