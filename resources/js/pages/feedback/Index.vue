@@ -39,7 +39,7 @@ function short(date) {
         <div class="flex h-full">
             <!-- List -->
             <section class="flex min-w-0 flex-1 flex-col lg:max-w-md lg:border-r lg:border-roxy-950/5" :class="{ 'max-lg:hidden': item }">
-                <div class="flex items-center justify-between gap-x-3 border-b border-roxy-950/5 px-4 py-3">
+                <div class="flex items-center justify-between gap-x-3 h-14 shrink-0 border-b border-roxy-950/5 px-4">
                     <h1 class="truncate font-display text-base font-semibold text-roxy-950">{{ site?.name ?? 'Feedback' }}</h1>
                     <div class="flex shrink-0 rounded-md bg-roxy-50 p-0.5 text-xs/5 font-medium ring-1 ring-roxy-950/5">
                         <button
@@ -118,7 +118,7 @@ function short(date) {
             <!-- Detail -->
             <section class="min-w-0 flex-1 flex-col" :class="item ? 'flex' : 'hidden lg:flex'">
                 <template v-if="item">
-                    <Link :href="`/app/feedback${query}`" class="flex items-center gap-x-1.5 border-b border-roxy-950/5 px-4 py-3 text-sm text-neutral-600 lg:hidden">
+                    <Link :href="`/app/feedback${query}`" class="flex items-center gap-x-1.5 h-14 shrink-0 border-b border-roxy-950/5 px-4 text-sm text-neutral-600 lg:hidden">
                         <ArrowLeftIcon class="size-4" />
                         {{ site?.name ?? 'Feedback' }}
                     </Link>

@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\MagicLinkController;
+use App\Http\Controllers\ReviewerController;
+use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
@@ -26,4 +28,9 @@ Route::middleware('auth')->prefix('app')->group(function () {
     Route::get('feedback/{feedback}', [FeedbackController::class, 'show'])->name('feedback.show');
     Route::post('feedback/{feedback}/resolve', [FeedbackController::class, 'resolve'])->name('feedback.resolve');
     Route::delete('feedback/{feedback}', [FeedbackController::class, 'destroy'])->name('feedback.destroy');
+
+    Route::resource('sites', SiteController::class)->except('edit');
+    Route::post('sites/{site}/reviewers', [ReviewerController::class, 'store'])->name('reviewers.store');
+    Route::post('sites/{site}/reviewers/{reviewer}/resend', [ReviewerController::class, 'resend'])->name('reviewers.resend');
+    Route::delete('sites/{site}/reviewers/{reviewer}', [ReviewerController::class, 'destroy'])->name('reviewers.destroy');
 });

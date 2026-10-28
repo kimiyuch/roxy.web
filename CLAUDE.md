@@ -16,7 +16,7 @@ Laravel 13, Fortify (dashboard login), Sanctum (MCP tokens), laravel/mcp, Inerti
 - Business logic lives in `app/Actions` (feedback create / resolve / delete, reviewer invite / login code / exchange), shared by the controllers and the MCP tools.
 - Widget API: `routes/api.php`, `app/Http/Controllers/Widget`, middleware `WidgetCors` + `AuthenticateReviewer`.
 - Website: `home.blade.php`, `legal.blade.php`, Blade components in `resources/views/components` (layout, header, footer like croc.web and wuff.web). `og-image.blade.php` → `scripts/og-image.sh` → `public/images/og.png`.
-- Dashboard pages: `resources/js/pages` (`auth/*`, `feedback/Index.vue`: the inbox, list and detail in one), layout with the sidebar in `resources/js/layouts/AppLayout.vue`. Icons: `@heroicons/vue` here, `blade-heroicons` on the website. The landing page's mocks (`site-window`, `dashboard-window`) are the design reference for the widget and the dashboard, see `docs/architecture.md`, Look and feel.
+- Dashboard pages: `resources/js/pages` (`auth/*`, `feedback/Index.vue`: the inbox, list and detail in one; `sites/Index.vue`: the same three columns, sites in the middle, the open site or "Add site" on the right, see `components/SiteDetail.vue`), layout with the sidebar in `resources/js/layouts/AppLayout.vue`. Icons: `@heroicons/vue` here, `blade-heroicons` on the website. The landing page's mocks (`site-window`, `dashboard-window`) are the design reference for the widget and the dashboard, see `docs/architecture.md`, Look and feel.
 - Widget: `resources/widget` (plain JS, Shadow DOM), built by `vite.widget.config.js` into `public/widget.js` and `public/widget-screenshot.js`. Try it on `https://roxy.web.test/widget-test`.
 - Settings: `config/roxy.php`.
 
@@ -25,7 +25,7 @@ Laravel 13, Fortify (dashboard login), Sanctum (MCP tokens), laravel/mcp, Inerti
 - Code style: Laravel defaults, 4 spaces, `vendor/bin/pint`.
 - `npm run build` (dashboard and widget) and commit `public/build`, `public/widget*.js` (no Node on Hostpoint).
 - Run `php artisan test` before committing.
-- Setup commands until the dashboard has them: `roxy:user`, `roxy:site`, `roxy:invite`, `roxy:mcp-token`.
+- Sites and reviewers are managed in the dashboard (`/app/sites`); agent tokens still need `roxy:mcp-token`. `roxy:user`, `roxy:site`, `roxy:invite` work too.
 
 ## Artwork
 

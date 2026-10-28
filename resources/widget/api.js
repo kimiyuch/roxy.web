@@ -50,7 +50,6 @@ export function createApi(base, key) {
         exchange: (code) => request('POST', 'session', { code }),
         requestLink: (email) => request('POST', 'link', { email, url: location.href.split('#')[0] }),
         me: () => request('GET', 'me'),
-        signOut: () => request('DELETE', 'session').finally(() => token.set(null)),
         openHere: () => request('GET', `feedback?url=${encodeURIComponent(location.href.split('#')[0])}`),
         send: (form) => request('POST', 'feedback', form),
     };

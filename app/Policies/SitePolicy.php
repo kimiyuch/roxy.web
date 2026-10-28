@@ -17,4 +17,9 @@ class SitePolicy
     {
         return $user->account_id === $site->account_id;
     }
+
+    public function delete(User $user, Site $site): bool
+    {
+        return $user->account_id === $site->account_id;
+    }
 }

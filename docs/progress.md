@@ -10,19 +10,19 @@ Where Roxy stands, for picking up in a new session. Update it at the end of each
 - **Storage**: no Exoscale. Screenshots live on the `local` disk (`storage/app/private`) on the Hostpoint server and are only handed out as signed temporary URLs.
 - **Website**: landing page in the croc.web / wuff.web house style (hero with a mock of the widget on a client site, how it works, MCP section with a Claude Code mock, dashboard mock, features, setup with copyable snippets), `/legal`, Open Graph image (`scripts/og-image.sh`).
 - **Dashboard**: the inbox in the look of the landing page mock: sidebar (feedback, sites with open counts), list (Open / Done), detail (screenshot with the picked element outlined, summary, raw console / network / HTML, note + Done, Reopen, discard). Login, forgot and reset password pages restyled to match; sign-out lands on the login page; sign-up (`/register`: new account + owner, rate-limited), password fields with show / hide; console / requests / HTML as custom disclosures.
-- **Widget**: `widget.js` (≈ 10 KB gz) with magic-link sign-in, `?feedback` sign-in form, panel as in the mock, open feedback on the page, automatic viewport screenshot (lazy `widget-screenshot.js`), own images (pick / drop / paste), element picker with position, console and network capture. Tested end to end on `/widget-test` and cross-origin on croc.web.test (script injected): the dashboard outlines the picked element on the screenshot. Selectors skip Tailwind classes; German texts; phone layout.
+- **Widget**: `widget.js` (≈ 10 KB gz) with magic-link sign-in, `?feedback` sign-in form, panel as in the mock, open feedback on the page, viewport screenshot on demand (lazy `widget-screenshot.js`), uploaded images (button / drop / paste), element picker with position, console and network capture. Tested end to end on `/widget-test` and cross-origin on croc.web.test (script injected): the dashboard outlines the picked element on the screenshot. Selectors skip Tailwind classes; German texts; phone layout.
+- **Dashboard: sites and reviewers**: three columns like the inbox (`/app/sites`, `/app/sites/create`, `/app/sites/{id}` render the same page): list with open counts, add site, site detail with the script tag (copy), reviewers (invite, copy their link, email a new one, remove = signed out everywhere), settings (addresses one per line, GitHub URL or owner/repo, button position and colour), delete with feedback and files. Flash messages as a toast.
 - **Local**: Herd link with SSL at `https://roxy.web.test`. The local database has demo sites (Croc, Alpenblick, Bäckerei Huber) and a few entries.
 
 ## Next
 
 1. **Widget, before real clients**: try it on a real phone (iOS Safari: screenshot, paste, picker by tap); pages with fixed headers and iframes; language as a site setting.
-2. **Dashboard: sites and reviewers** (what it takes to onboard a client): sites (create, edit origins / start page / repository, copy the script tag, button position and colour, delete); reviewers per site (invite, resend the link, last seen, remove = sign out everywhere).
 3. **Dashboard: agent tokens**: create with a name, show the `claude mcp add` command once, last used, revoke; maybe scope to one site.
 4. **Dashboard: profile**: name, email, password (Fortify's `updatePasswords`), email notifications on / off. Maybe email verification for sign-ups, and a "Sign up" call to action on the landing page.
 5. **Later**: team (invite colleagues into the account; `accounts` and `role` exist), inbox search, keyboard shortcuts (j / k, d for done).
 6. **Deploy**: `deploy.sh` (rsync like croc.web, never touch `storage/`), Hostpoint cron (`schedule:run`, `queue:work --stop-when-empty`), `.env`, check Imagick, `roxy.kimiyu.ch`.
 
-Until the dashboard pages exist: `roxy:user`, `roxy:site`, `roxy:invite`, `roxy:mcp-token`.
+Until the agent tokens page exists: `roxy:mcp-token` (the other commands still work too).
 
 ## Open questions
 

@@ -43,7 +43,7 @@ Roxy's domain can't write to the client site's localStorage, so the login goes t
 | POST | `session` | code | Trade the magic-link code for a token |
 | POST | `link` | none | Email a magic link to a known reviewer |
 | GET | `me` | token | Reviewer + site name and settings (button position, colour) |
-| DELETE | `session` | token | Log out this browser |
+| DELETE | `session` | token | Log out this browser (not used by the widget: reviewers stay signed in until they’re removed in the dashboard) |
 | GET | `feedback?url=` | token | Open feedback on that page (same path), all reviewers |
 | POST | `feedback` | token | Multipart: `body`, `url`, `context`/`element`/`console`/`network` as JSON strings, `screenshots[]` + `screenshot_kinds[]` |
 
@@ -85,15 +85,16 @@ Not yet: scoping a token to a single site (`site_id` on the token).
 `resources/widget/`, plain JavaScript, built by `vite.widget.config.js` (`npm run build:widget`, part of `npm run build`) into two classic scripts in `public/`:
 
 - `widget.js` (≈ 10 KB gzipped): boots from `data-site`, finds Roxy's origin from its own `src`, renders into a `<roxy-widget>` shadow root (plain CSS in `styles.css`, no Tailwind: its `@property` variables don't work in shadow DOM).
-- `widget-screenshot.js` (≈ 10 KB gzipped, `modern-screenshot`): only loaded when a reviewer opens the panel. Takes the viewport (`translate(-scroll)` on the root, the visible area without scrollbars, the same box as `element.rect`), at most 2× and 2560 px, without Roxy itself; taken again after the reviewer points at an element, so `element.rect` matches it.
+- `widget-screenshot.js` (≈ 10 KB gzipped, `modern-screenshot`): only loaded when a reviewer takes the first screenshot. Takes the viewport (`translate(-scroll)` on the root, the visible area without scrollbars, the same box as `element.rect`), at most 2× and 2560 px, without Roxy itself. Taken on demand ("Screenshot" button, replaces the previous one); the picked element is measured again at that moment and the screenshot is retaken after a new pick, so `element.rect` always matches it.
 
 Behaviour:
 
+- Caching: `widget.js` keeps its address, so `public/.htaccess` (Apache, Hostpoint) lets browsers keep it for 5 minutes, then revalidate. Locally (Herd / nginx) there's no such header: hard-reload after a widget build.
 - Visitors without a token get nothing: no button, no capture, no requests beyond loading the script.
 - `#roxy=CODE` (from the magic link) is removed from the address, traded for a token (localStorage `roxy:<site key>`), and the panel opens.
 - With a token, console errors (`console.error`, `error`, `unhandledrejection`) and failed requests (`fetch`, XHR, failed scripts / images; query strings dropped; Roxy's own calls ignored) are recorded from load, 20 each. Capture pauses while the screenshot runs.
 - `?feedback` in the address without a token shows the sign-in form (email → `POST /link`).
-- The panel: what's open on this page (all reviewers), text, the screenshot plus own images (pick, drop, paste; ≤ 5, fitted to 2560 px), "Point at it" (outline in the shadow root, Esc cancels), Send (⌘/Ctrl + Enter). The automatic screenshot is always uploaded first.
+- The panel: what's open on this page (all reviewers), text, "Screenshot" and "Upload image" buttons (images also by drop or paste; ≤ 5, fitted to 2560 px), "Point at it" (outline in the shadow root, Esc cancels), Send (⌘/Ctrl + Enter). The automatic screenshot is always uploaded first.
 - Requests without an `Origin` header (same-origin, non-browser) pass `WidgetCors` without CORS headers; the token is what protects the API.
 - Selectors skip utility classes (Tailwind and the like) and state classes, and walk up to an id, a landmark (`main`, `header`, `nav`, `section`, …) or four steps; a click on an icon counts as its button or link.
 - Texts in `strings.js`: German (Swiss spelling, "Sie") when `<html lang>` or the browser says `de`, English otherwise.

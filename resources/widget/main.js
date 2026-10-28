@@ -48,7 +48,9 @@ function takeCode() {
 }
 
 async function run(api, base, code) {
-    const widget = mount(base);
+    // Only on the page once there's something to show: visitors without a token get no element at all
+    let mounted;
+    const widget = { signIn: (...args) => (mounted ??= mount(base)).signIn(...args), ready: (...args) => (mounted ??= mount(base)).ready(...args) };
 
     if (code) {
         try {
@@ -180,7 +182,6 @@ function mount(base) {
             if (state.sent) reset();
             renderPanel();
             panel.querySelector('textarea')?.focus();
-            if (!state.shots.some((shot) => shot.kind === 'auto')) screenshot();
         }
 
         function close() {
@@ -194,19 +195,25 @@ function mount(base) {
 
         function reset() {
             state.shots.forEach((shot) => URL.revokeObjectURL(shot.url));
-            Object.assign(state, { shots: [], element: null, sent: false, error: null, draft: '' });
+            Object.assign(state, { shots: [], element: null, picked: null, sent: false, error: null, draft: '' });
         }
 
-        /** The viewport as the reviewer sees it, taken again after they point at something. */
+        /**
+         * The window as the reviewer sees it right now, scrolled or not; replaces the previous one.
+         * The picked element is measured again, so its outline matches this screenshot.
+         */
         function screenshot() {
+            if (state.taking) return;
             const taking = (async () => {
                 pauseCapture(true);
                 try {
                     const result = await takeScreenshot(base, VERSION, host);
+                    if (state.picked?.isConnected) state.element = describe(state.picked);
+                    state.shots.filter((shot) => shot.kind === 'auto').forEach((shot) => URL.revokeObjectURL(shot.url));
                     state.shots = state.shots.filter((shot) => shot.kind !== 'auto');
                     state.shots.unshift({ kind: 'auto', blob: result.blob, url: URL.createObjectURL(result.blob), scroll: { x: scrollX, y: scrollY } });
                 } catch {
-                    // No automatic screenshot: the feedback still goes out without it.
+                    showError(t('screenshotFailed'));
                 } finally {
                     pauseCapture(false);
                 }
@@ -231,24 +238,26 @@ function mount(base) {
                     reset();
                     renderPanel();
                     panel.querySelector('textarea').focus();
-                    screenshot();
                 });
                 return;
             }
 
             panel.innerHTML = `
-                ${head(t('panelTitle'), t('signedInAs', reviewer), `<button class="icon-button" type="button" data-action="sign-out" title="${esc(t('signOut'))}">${icon('signOut')}<span class="sr-only">${esc(t('signOut'))}</span></button>`)}
+                ${head(t('panelTitle'), t('signedInAs', reviewer))}
                 <div class="body">
                     <div class="open-here" hidden></div>
                     <label class="sr-only" for="roxy-body">${esc(t('whatShouldChange'))}</label>
                     <textarea id="roxy-body" rows="4" placeholder="${esc(t('whatShouldChange'))}"></textarea>
+                    <div class="tools">
+                        <button class="tool" type="button" data-action="screenshot">${icon('camera')}<span></span></button>
+                        <button class="tool" type="button" data-action="image">${icon('photo')}${esc(t('uploadImage'))}</button>
+                        <input type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+                    </div>
                     <div class="attachments"></div>
                     <div class="error" hidden></div>
                 </div>
                 <div class="foot">
                     <button class="ghost" type="button" data-action="pick">${icon('pick')}${esc(t('pointAtIt'))}</button>
-                    <button class="ghost" type="button" data-action="image">${icon('photo')}${esc(t('addImage'))}</button>
-                    <input type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
                     <button class="button" type="button" data-action="send">${esc(t('send'))}</button>
                 </div>`;
 
@@ -282,13 +291,9 @@ function mount(base) {
             });
 
             panel.querySelector('[data-action="image"]').addEventListener('click', () => input.click());
+            panel.querySelector('[data-action="screenshot"]').addEventListener('click', screenshot);
             panel.querySelector('[data-action="pick"]').addEventListener('click', pick);
             panel.querySelector('[data-action="send"]').addEventListener('click', send);
-            panel.querySelector('[data-action="sign-out"]').addEventListener('click', async () => {
-                await api.signOut().catch(() => {});
-                host.remove();
-                window.__roxy = null;
-            });
 
             renderOpenHere();
             renderAttachments();
@@ -322,6 +327,11 @@ function mount(base) {
             const box = panel.querySelector('.attachments');
             if (!box) return;
 
+            const auto = state.shots.some((shot) => shot.kind === 'auto');
+            const button = panel.querySelector('[data-action="screenshot"]');
+            button.disabled = Boolean(state.taking);
+            button.querySelector('span').textContent = state.taking ? t('takingScreenshot') : auto ? t('retakeScreenshot') : t('takeScreenshot');
+
             const shots = state.shots
                 .map((shot, i) => `
                     <div class="shot">
@@ -335,15 +345,10 @@ function mount(base) {
                 ? `<div class="fact element">${icon('pick')}<code title="${esc(state.element.selector)}">${esc(state.element.selector.split(' > ').pop())}</code>
                    <button class="clear" type="button" data-action="clear-element" title="${esc(t('forgetElement'))}">${icon('close')}<span class="sr-only">${esc(t('forgetElement'))}</span></button></div>`
                 : '';
-            const auto = state.shots.some((shot) => shot.kind === 'auto');
-
+            box.hidden = !(shots || taking || element);
             box.innerHTML = `
-                <div class="shots">${taking}${shots}</div>
-                <div class="facts" style="margin-top:${shots || taking ? 8 : 0}px">
-                    ${state.taking ? `<div class="fact muted">${icon('camera')}${esc(t('takingScreenshot'))}</div>` : auto ? `<div class="fact">${icon('camera')}${esc(t('screenshot'))}</div>` : ''}
-                    ${element}
-                    <div class="fact muted">${icon('chat')}${esc(t('contextAdded'))}</div>
-                </div>`;
+                ${shots || taking ? `<div class="shots">${taking}${shots}</div>` : ''}
+                ${element ? `<div class="facts" style="margin-top:${shots || taking ? 8 : 0}px">${element}</div>` : ''}`;
 
             box.querySelectorAll('[data-remove]').forEach((button) =>
                 button.addEventListener('click', () => {
@@ -354,6 +359,7 @@ function mount(base) {
             );
             box.querySelector('[data-action="clear-element"]')?.addEventListener('click', () => {
                 state.element = null;
+                state.picked = null;
                 renderAttachments();
             });
         }
@@ -392,8 +398,10 @@ function mount(base) {
             panel.hidden = false;
             launcher.hidden = false;
             if (element) {
+                state.picked = element;
                 state.element = describe(element);
-                screenshot();
+                // A screenshot taken before may show another part of the page now
+                if (state.shots.some((shot) => shot.kind === 'auto')) screenshot();
             }
             renderAttachments();
             panel.querySelector('textarea')?.focus();

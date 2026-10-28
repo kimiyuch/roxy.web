@@ -38,7 +38,7 @@
                     <p>
                         Reviewers are invited by the site’s owner with their email address and, if given, their name. Roxy uses
                         the address only to send sign-in links. After signing in, the browser keeps a token in the site’s local
-                        storage, so the widget knows who’s giving feedback. Signing out deletes it.
+                        storage, so the widget knows who’s giving feedback. It works until the site’s owner removes them as a reviewer.
                     </p>
                     <p>
                         For everyone who isn’t invited, the widget does nothing: it doesn’t show, doesn’t record anything and

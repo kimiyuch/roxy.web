@@ -7,7 +7,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\URL;
 
 /**
  * The link that turns the widget on for a reviewer. It points at Roxy (signed,
@@ -28,11 +27,7 @@ class ReviewerMagicLink extends Notification implements ShouldQueue
     public function toMail(Reviewer $reviewer): MailMessage
     {
         $site = $reviewer->site;
-        $url = URL::temporarySignedRoute(
-            'reviewers.magic-link',
-            now()->addDays(config('roxy.invite_link_days')),
-            array_filter(['reviewer' => $reviewer, 'to' => $this->to]),
-        );
+        $url = $reviewer->magicLink($this->to);
 
         return (new MailMessage)
             ->subject($this->invited ? "You're invited to review {$site->name}" : "Your link to review {$site->name}")

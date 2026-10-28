@@ -57,6 +57,24 @@ class Site extends Model
      * Exact origins (`https://staging.example.ch`) or one wildcard subdomain level
      * (`https://*.example.ch`). Scheme and port must match.
      */
+    /** `https://staging.example.ch` from any URL on it; null if it isn't one. */
+    public static function originOf(string $url): ?string
+    {
+        $parts = parse_url(trim($url));
+
+        if (! isset($parts['scheme'], $parts['host']) || ! in_array(Str::lower($parts['scheme']), ['http', 'https'])) {
+            return null;
+        }
+
+        return Str::lower($parts['scheme'].'://'.$parts['host']).(isset($parts['port']) ? ':'.$parts['port'] : '');
+    }
+
+    /** What goes on the client's site. */
+    public function scriptTag(): string
+    {
+        return '<script src="'.url('widget.js').'" data-site="'.$this->key.'" defer></script>';
+    }
+
     public function allowsOrigin(?string $origin): bool
     {
         if (! $origin) {

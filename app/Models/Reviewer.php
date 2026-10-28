@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\URL;
 
 /**
  * Someone invited to leave feedback on one site. Reviewers never log in to Roxy:
@@ -43,6 +44,16 @@ class Reviewer extends Model
     public function feedback(): HasMany
     {
         return $this->hasMany(Feedback::class);
+    }
+
+    /** The signed link from the invitation email; opens the site and signs the widget in. */
+    public function magicLink(?string $to = null): string
+    {
+        return URL::temporarySignedRoute(
+            'reviewers.magic-link',
+            now()->addDays(config('roxy.invite_link_days')),
+            array_filter(['reviewer' => $this, 'to' => $to]),
+        );
     }
 
     public function displayName(): string

@@ -16,8 +16,7 @@ class CreateSite extends Command
     {
         $user = User::where('email', $this->argument('user'))->firstOrFail();
         $url = $this->argument('url');
-        $parts = parse_url($url);
-        $origin = $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '');
+        $origin = Site::originOf($url);
 
         $site = Site::create([
             'account_id' => $user->account_id,
@@ -29,7 +28,7 @@ class CreateSite extends Command
 
         $this->info("Created {$site->name} ({$site->id}).");
         $this->line('Script tag:');
-        $this->line('  <script src="'.url('widget.js').'" data-site="'.$site->key.'" defer></script>');
+        $this->line('  '.$site->scriptTag());
 
         return self::SUCCESS;
     }

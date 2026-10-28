@@ -30,3 +30,37 @@
     --color-pin-500: #ff7a59;
     --color-pin-600: #e5482a;
 }
+
+/* Subtle scrollbars: thin and light, a bit darker on hover. The standard properties for Chrome
+   and Firefox; Safari doesn't know them yet and gets the ::-webkit-scrollbar version. */
+@layer base {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: rgb(30 42 59 / 0.18) transparent;
+    }
+
+    *:hover {
+        scrollbar-color: rgb(30 42 59 / 0.32) transparent;
+    }
+
+    @supports not (scrollbar-color: auto) {
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border: 3px solid transparent;
+            border-radius: 999px;
+            background: rgb(30 42 59 / 0.18) padding-box;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: rgb(30 42 59 / 0.32);
+        }
+    }
+}

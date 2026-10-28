@@ -23,3 +23,11 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# The widget lives at a fixed address on client sites, so browsers may keep it for only a few
+# minutes before checking for a new version (the ETag makes that check cheap).
+<IfModule mod_headers.c>
+    <FilesMatch "^widget(-screenshot)?\.js$">
+        Header set Cache-Control "public, max-age=300, must-revalidate"
+    </FilesMatch>
+</IfModule>
