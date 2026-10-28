@@ -2,7 +2,12 @@
 
 `./deploy.sh` uploads the committed state to `~/www/roxy.kimiyu.ch` on Hostpoint (rsync over
 SSH, like croc.web), runs the migrations and refreshes the caches. It never touches the
-server's `.env`, `storage/` (the screenshots) or `database/database.sqlite`.
+server's `.env`, `public/.htaccess`, `storage/` (the screenshots) or `database/database.sqlite`.
+
+`public/.htaccess` is only uploaded when the server has none: after that it belongs to the server,
+because the Hostpoint panel writes the PHP version into it ("Use php-fpm latest"). If the repo's
+`public/.htaccess` changes (Laravel's rewrite rules, the 5-minute cache for `widget.js`), copy the
+change into the server's file by hand.
 
 Before deploying: `npm run build`, commit, tests green (deploy.sh checks all three).
 

@@ -3,7 +3,8 @@
 # using your own SSH key. Run from your Mac: ./deploy.sh
 #
 # Assets (dashboard and widget) are built locally and committed (npm run build). The server's
-# .env, storage (screenshots!), caches and the SQLite database are never overwritten or deleted.
+# .env, public/.htaccess (the Hostpoint panel writes the PHP version into it), storage (screenshots!),
+# caches and the SQLite database are never overwritten or deleted.
 # First-time server setup: see docs/deploy.md.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -44,11 +45,17 @@ composer install --working-dir="$STAGE" --no-interaction --no-progress --no-dev 
 echo "Uploading…"
 rsync -az --delete \
   --exclude '/.github' --exclude '/node_modules' --exclude '/tests' --exclude '/artwork' \
-  --exclude '/.env' --exclude '/public/hot' --exclude '/deploy.sh' \
+  --exclude '/.env' --exclude '/public/hot' --exclude '/deploy.sh' --exclude '/public/.htaccess' \
   --filter 'protect /storage/**' \
   --filter 'protect /bootstrap/cache/*.php' \
   --filter 'protect /database/database.sqlite' \
   "$STAGE/" "$HOST:$DEST/"
+
+# public/.htaccess belongs to the server once it's there: only uploaded if it's missing
+if ! ssh "$HOST" "test -f '$DEST/public/.htaccess'"; then
+  echo "No public/.htaccess on the server yet, uploading the repo's. Then set the PHP version in the Hostpoint panel."
+  scp -q public/.htaccess "$HOST:$DEST/public/.htaccess"
+fi
 
 if ! ssh "$HOST" "test -f '$DEST/.env'"; then
   echo
