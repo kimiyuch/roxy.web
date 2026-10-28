@@ -12,13 +12,14 @@ Before deploying: `npm run build`, commit, tests green (deploy.sh checks all thr
    - Domain `roxy.kimiyu.ch` with the document root `www/roxy.kimiyu.ch/public`, Let's Encrypt on.
    - PHP 8.4 for it, with Imagick (Hostpoint has it; check with `php -m | grep imagick`).
    - Mailbox `roxy@kimiyu.ch` (for invitations and new-feedback emails).
-   - Cron job, every minute: `cd ~/www/roxy.kimiyu.ch && php artisan schedule:run >/dev/null 2>&1`
-     (it also sends the queued emails).
+   - Cron job, every minute: `cd ~/www/roxy.kimiyu.ch && /path/to/php8.4 artisan schedule:run >/dev/null 2>&1`
+     (it also sends the queued emails). The plain `php` on the server is older than 8.4; `./deploy.sh`
+     finds PHP 8.4 and prints the exact cron command at the end.
 2. **SSH key loaded**: `ssh-add --apple-use-keychain ~/.ssh/id_ed25519` (or whichever key Hostpoint knows).
 3. `./deploy.sh`: uploads the code, then stops because there's no `.env` yet, and prints:
    ```sh
    scp .env.production.example pumutuxu@pumutuxu.myhostpoint.ch:/home/pumutuxu/www/roxy.kimiyu.ch/.env
-   ssh pumutuxu@pumutuxu.myhostpoint.ch "cd /home/pumutuxu/www/roxy.kimiyu.ch && php artisan key:generate --force"
+   ssh pumutuxu@pumutuxu.myhostpoint.ch "cd /home/pumutuxu/www/roxy.kimiyu.ch && /path/to/php8.4 artisan key:generate --force"
    ```
    Then put the mailbox password into `MAIL_PASSWORD` in the server's `.env`.
 4. `./deploy.sh` again: creates the SQLite database, migrates, caches.
