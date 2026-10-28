@@ -1,0 +1,35 @@
+# Roxy
+
+> Roxy is a feedback widget for websites, made for coding agents. A client points at what's wrong on a staging site and writes a sentence; Roxy adds a screenshot, the clicked element (CSS selector, text, HTML), the page, the browser and window size, and the last console errors and failed requests. A coding agent reads the feedback over MCP, fixes the code and marks the feedback as done.
+
+Made by kimiyu (https://kimiyu.ch). Hosted in Switzerland. Early access.
+
+## How it works
+
+- The site owner adds a site in the dashboard (https://roxy.kimiyu.ch/app) with its addresses and its GitHub repository, puts one script tag on it, and invites reviewers by email.
+- Reviewers sign in with the link from the email (no password). Visitors who aren't invited see nothing.
+- Feedback arrives in the dashboard and over MCP.
+
+## For agents: the MCP server
+
+- Endpoint: `https://roxy.kimiyu.ch/mcp` (streamable HTTP), authenticated with a Bearer token the site owner creates.
+- Connect Claude Code: `claude mcp add --transport http roxy https://roxy.kimiyu.ch/mcp --header "Authorization: Bearer <token>"`
+- Tools:
+  - `list_sites`: the sites the token can reach, each with its GitHub repository.
+  - `list_feedback`: feedback per site and status (open / done), with the page path and the element selector.
+  - `get_feedback`: one entry in full: text, page, element, browser, console errors, failed requests, and the screenshots as images.
+  - `resolve_feedback`: mark it done (or reopen it), with a short note on what changed.
+  - `discard_feedback`: delete an entry that isn't feedback.
+- Workflow: list the open feedback, open one entry, find the code from the repository, the URL path and the selector, fix it, then resolve it with a note.
+
+## Install on a site
+
+```html
+<script src="https://roxy.kimiyu.ch/widget.js" data-site="SITE_KEY" defer></script>
+```
+
+## Pages
+
+- [Home](https://roxy.kimiyu.ch/): what Roxy does, features, setup
+- [Legal notice](https://roxy.kimiyu.ch/legal): what Roxy stores, privacy, contact
+- [Source code](https://github.com/kimiyuch/roxy.web)

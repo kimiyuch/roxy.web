@@ -10,7 +10,8 @@
     <meta property="og:site_name" content="Roxy">
     <meta property="og:title" content="Roxy: client feedback your coding agent can fix">
     <meta property="og:description" content="Your client points at the problem. Claude reads it over MCP, with the screenshot, the element and the console, fixes it and marks it done.">
-    <meta property="og:url" content="{{ url('/') }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <link rel="canonical" href="{{ url()->current() }}">
     <meta property="og:image" content="{{ asset('images/og.png') }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">

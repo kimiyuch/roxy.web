@@ -1,2 +1,11 @@
 User-agent: *
-Disallow:
+Disallow: /app
+Disallow: /r/
+Disallow: /api/
+Disallow: /mcp
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://roxy.kimiyu.ch/sitemap.xml
