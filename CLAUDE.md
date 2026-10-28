@@ -11,7 +11,7 @@ Read first:
 
 ## Stack
 
-Laravel 13, Fortify (dashboard login), Sanctum (MCP tokens), laravel/mcp, Inertia + Vue 3 + Tailwind 4, spatie/image + Imagick. SQLite locally, MySQL on Hostpoint. Runs in Herd at `https://roxy.web.test`.
+Laravel 13, Fortify (dashboard login), Sanctum (MCP tokens), laravel/mcp, Inertia + Vue 3 + Tailwind 4, spatie/image + Imagick. SQLite, locally and on Hostpoint. Deploy: `./deploy.sh`, see `docs/deploy.md`. Runs in Herd at `https://roxy.web.test`.
 
 - Business logic lives in `app/Actions` (feedback create / resolve / delete, reviewer invite / login code / exchange), shared by the controllers and the MCP tools.
 - Widget API: `routes/api.php`, `app/Http/Controllers/Widget`, middleware `WidgetCors` + `AuthenticateReviewer`.

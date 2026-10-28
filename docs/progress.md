@@ -20,7 +20,7 @@ Where Roxy stands, for picking up in a new session. Update it at the end of each
 3. **Dashboard: agent tokens**: create with a name, show the `claude mcp add` command once, last used, revoke; maybe scope to one site.
 4. **Dashboard: profile**: name, email, password (Fortify's `updatePasswords`), email notifications on / off. Maybe email verification for sign-ups, and a "Sign up" call to action on the landing page.
 5. **Later**: team (invite colleagues into the account; `accounts` and `role` exist), inbox search, keyboard shortcuts (j / k, d for done).
-6. **Deploy**: `deploy.sh` (rsync like croc.web, never touch `storage/`), Hostpoint cron (`schedule:run`, `queue:work --stop-when-empty`), `.env`, check Imagick, `roxy.kimiyu.ch`.
+6. **Deploy**: `deploy.sh` and `docs/deploy.md` are ready (SQLite, Hostpoint mailbox over SMTP, one cron job). First deploy to `roxy.kimiyu.ch` still to do.
 
 Until the agent tokens page exists: `roxy:mcp-token` (the other commands still work too).
 

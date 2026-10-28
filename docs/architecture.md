@@ -6,7 +6,7 @@ Decided on 2026-10-27, after `plan.md`. Where the two disagree, this file wins.
 
 | Question | Decision |
 |---|---|
-| Hosting | Hostpoint, like the other kimiyu apps (`roxy.kimiyu.ch`), MySQL. No long-running workers: the queue is drained from cron. |
+| Hosting | Hostpoint, like the other kimiyu apps (`roxy.kimiyu.ch`), SQLite (a file on the server, never touched by deploys). No long-running workers: the queue is drained from cron. |
 | Dashboard | Inertia + Vue 3 (no separate SPA API). |
 | Reviewers | Per site. One invite = one site. |
 | Can reviewers see each other's feedback? | Yes: the widget lists open feedback on the current page from every reviewer of the site, to avoid duplicates. |
@@ -76,7 +76,8 @@ Not yet: scoping a token to a single site (`site_id` on the token).
 
 ## Hostpoint notes
 
-- Queue: `database`. Cron every minute: `php artisan schedule:run` plus `php artisan queue:work --stop-when-empty --max-time=50`. Mails (invites, new feedback) are queued.
+- Queue: `database`. One cron job every minute runs `php artisan schedule:run`, which drains the queue (`routes/console.php`). Mails (invites, new feedback) are queued and go out through a Hostpoint mailbox over SMTP.
+- Deploy: `./deploy.sh`, first-time setup in `docs/deploy.md`.
 - Inertia SSR is off (`config/inertia.php`). There's no Node on the server; `public/build` is built locally and committed, as in the other kimiyu repos.
 - Imagick: re-check that it's enabled for the PHP version chosen in the Hostpoint panel.
 
