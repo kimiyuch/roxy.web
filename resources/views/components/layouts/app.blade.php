@@ -21,6 +21,22 @@
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
 
+    {{-- Structured data: what Roxy is, and who makes it (kimiyu.ch lists all the apps the same way) --}}
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'SoftwareApplication',
+            'name' => 'Roxy',
+            'url' => url('/'),
+            'image' => asset('images/og.png'),
+            'description' => 'A feedback widget for websites. Clients point at what’s wrong; Roxy adds a screenshot, the element, the page and the console errors, and coding agents read it over MCP, fix it and mark it done.',
+            'applicationCategory' => 'DeveloperApplication',
+            'operatingSystem' => 'Web',
+            'publisher' => ['@type' => 'Organization', 'name' => 'kimiyu studio', 'url' => 'https://kimiyu.ch/'],
+            'sameAs' => [config('roxy.repository_url')],
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
+    </script>
+
     @fonts
 
     @vite(['resources/css/app.css'])
