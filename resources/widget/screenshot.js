@@ -32,6 +32,15 @@ function settleImages(root) {
     });
 }
 
+// The copy of <html> gets the viewport's size, so overflow on <html> or <body> (`overflow-y: scroll`,
+// `overflow-x: hidden` with `height: 100%`) would clip it to the first screen, and the shift to the
+// scroll position below would then show nothing. Let both overflow; the SVG crops to the viewport.
+function unclip(element) {
+    if (element.tagName === 'HTML' || element.tagName === 'BODY') {
+        element.style.setProperty('overflow', 'visible', 'important');
+    }
+}
+
 /** A JPEG of what's in the viewport right now, without Roxy itself. */
 window.__roxyScreenshot = async function (host) {
     // The visible area without scrollbars, the same box `element.rect` and the context's viewport use
@@ -48,9 +57,15 @@ window.__roxyScreenshot = async function (host) {
         quality: 0.85,
         backgroundColor: background && background !== 'rgba(0, 0, 0, 0)' ? background : '#ffffff',
         filter: (node) => node !== host,
-        style: { transform: `translate(${-scrollX}px, ${-scrollY}px)`, transformOrigin: 'top left' },
+        // A margin, not a transform: a transform would make fixed elements (headers, cookie banners)
+        // position against <html> instead of the viewport.
+        style: { margin: `${-scrollY}px 0 0 ${-scrollX}px` },
         timeout: 15000,
-        onCloneEachNode: (node) => node.nodeType === Node.ELEMENT_NODE && cleanAttributes(node),
+        onCloneEachNode: (node) => {
+            if (node.nodeType !== Node.ELEMENT_NODE) return;
+            cleanAttributes(node);
+            unclip(node);
+        },
         onEmbedNode: (clone) => clone.nodeType === Node.ELEMENT_NODE && settleImages(clone),
     });
 
