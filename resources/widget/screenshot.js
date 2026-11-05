@@ -4,6 +4,34 @@ import { domToBlob } from 'modern-screenshot';
 
 const MAX_EDGE = 2560;
 
+// The copy is serialized as XML inside an SVG, so every attribute name must be a valid XML name
+// without a namespace prefix: Alpine's `@click`, `:id`, `x-on:click`, `x-bind:id` would break it.
+// Real namespaced attributes (`xlink:href`, `xml:space` on SVG) carry a namespaceURI and are kept.
+const XML_NAME = /^[A-Za-z_][\w.-]*$/;
+
+function cleanAttributes(element) {
+    for (const attr of [...element.attributes]) {
+        if (!attr.namespaceURI && !XML_NAME.test(attr.name)) {
+            element.removeAttribute(attr.name);
+        }
+    }
+}
+
+// Images the library couldn't inline (lazy ones not loaded yet, failed fetches) still point at a URL,
+// which an SVG drawn as an image never loads. Hide them instead of leaving broken boxes, and drop
+// <picture> sources, which would win over the inlined <img src>.
+function settleImages(root) {
+    root.querySelectorAll('picture > source').forEach((source) => source.remove());
+    root.querySelectorAll('img').forEach((img) => {
+        img.removeAttribute('loading');
+        if (!(img.getAttribute('src') ?? '').startsWith('data:')) {
+            img.removeAttribute('src');
+            img.removeAttribute('srcset');
+            img.style.visibility = 'hidden';
+        }
+    });
+}
+
 /** A JPEG of what's in the viewport right now, without Roxy itself. */
 window.__roxyScreenshot = async function (host) {
     // The visible area without scrollbars, the same box `element.rect` and the context's viewport use
@@ -22,6 +50,8 @@ window.__roxyScreenshot = async function (host) {
         filter: (node) => node !== host,
         style: { transform: `translate(${-scrollX}px, ${-scrollY}px)`, transformOrigin: 'top left' },
         timeout: 15000,
+        onCloneEachNode: (node) => node.nodeType === Node.ELEMENT_NODE && cleanAttributes(node),
+        onEmbedNode: (clone) => clone.nodeType === Node.ELEMENT_NODE && settleImages(clone),
     });
 
     return { blob, width: Math.round(width * scale), height: Math.round(height * scale) };
