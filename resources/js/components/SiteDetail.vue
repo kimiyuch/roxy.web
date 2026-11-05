@@ -6,6 +6,7 @@ import CodeBlock from './CodeBlock.vue';
 import PrimaryButton from './PrimaryButton.vue';
 import SiteForm from './SiteForm.vue';
 import TextInput from './TextInput.vue';
+import { confirm } from '../composables/confirm.js';
 import { siteDot, timeAgo } from '../utils.js';
 
 // The third column of the sites page: script tag, reviewers, settings, delete.
@@ -30,8 +31,13 @@ function resend(reviewer) {
     router.post(`/app/sites/${props.site.id}/reviewers/${reviewer.id}/resend`, {}, { preserveScroll: true });
 }
 
-function remove(reviewer) {
-    if (confirm(`Remove ${reviewer.name || reviewer.email}? They’re signed out everywhere and can’t give feedback anymore. Their feedback stays.`)) {
+async function remove(reviewer) {
+    const ok = await confirm({
+        title: `Remove ${reviewer.name || reviewer.email}?`,
+        message: 'They’re signed out everywhere and can’t give feedback anymore. Their feedback stays.',
+        action: 'Remove',
+    });
+    if (ok) {
         router.delete(`/app/sites/${props.site.id}/reviewers/${reviewer.id}`, { preserveScroll: true });
     }
 }
@@ -47,8 +53,13 @@ function save() {
     settings.put(`/app/sites/${props.site.id}`, { preserveScroll: true, preserveState: true, onSuccess: () => settings.defaults() });
 }
 
-function destroy() {
-    if (confirm(`Delete ${props.site.name} with all its feedback and screenshots? This can’t be undone.`)) {
+async function destroy() {
+    const ok = await confirm({
+        title: `Delete ${props.site.name}?`,
+        message: 'All its feedback and screenshots go with it. This can’t be undone.',
+        action: 'Delete site',
+    });
+    if (ok) {
         router.delete(`/app/sites/${props.site.id}`);
     }
 }

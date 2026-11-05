@@ -2,6 +2,7 @@
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { ArrowRightStartOnRectangleIcon, CheckCircleIcon, GlobeAltIcon, InboxIcon, XMarkIcon } from '@heroicons/vue/20/solid';
 import { computed, onUnmounted, ref } from 'vue';
+import ConfirmDialog from '../components/ConfirmDialog.vue';
 import { siteDot } from '../utils.js';
 
 const page = usePage();
@@ -120,5 +121,6 @@ function logout() {
                 </button>
             </div>
         </Transition>
+        <ConfirmDialog />
     </div>
 </template>

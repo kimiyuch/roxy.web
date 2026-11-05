@@ -3,6 +3,7 @@ import { router, useForm } from '@inertiajs/vue3';
 import { ArrowTopRightOnSquareIcon, ArrowUturnLeftIcon, CheckIcon, TrashIcon } from '@heroicons/vue/20/solid';
 import { computed } from 'vue';
 import Disclosure from './Disclosure.vue';
+import { confirm } from '../composables/confirm.js';
 import { browserName, timeAgo } from '../utils.js';
 
 const props = defineProps({ item: Object, query: String });
@@ -45,8 +46,8 @@ function resolve(resolved) {
     form.post(`/app/feedback/${props.item.id}/resolve`, { preserveScroll: true, onSuccess: () => form.reset('note') });
 }
 
-function discard() {
-    if (confirm('Delete this feedback and its screenshots for good?')) {
+async function discard() {
+    if (await confirm({ title: 'Delete this feedback?', message: 'The feedback and its screenshots are gone for good.', action: 'Delete' })) {
         router.delete(`/app/feedback/${props.item.id}${props.query}`);
     }
 }
